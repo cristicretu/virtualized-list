@@ -9,15 +9,16 @@ const overscan = 10;
 export const VirtualizedList = ({ itemCount }: { itemCount: number }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
-  const endIndex = Math.min(
-    itemCount,
-    Math.ceil((scrollTop + windowHeight) / itemHeight) + overscan
+  const renderedNodesCount = Math.min(
+    itemCount - startIndex,
+    Math.ceil(windowHeight / itemHeight) + overscan * 2
   );
 
   const generateRows = () => {
     const rows = [];
-    for (let index = startIndex; index < endIndex; index++) {
-      rows.push(listItem(index));
+    for (let index = 0; index < renderedNodesCount; index++) {
+      const i = startIndex + index;
+      rows.push(listItem(i));
     }
     return rows;
   };
@@ -25,14 +26,18 @@ export const VirtualizedList = ({ itemCount }: { itemCount: number }) => {
   return (
     <ul
       style={{ height: windowHeight, overflowY: "scroll" }}
-      className="overflow-y-scroll w-full border-2 border-black relative"
+      className="overflow-y-scroll w-full border-2 border-black"
       onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
     >
-      <div
-        style={{ height: itemCount * itemHeight }}
-        className="absolute w-full"
-      />
-      {generateRows()}
+      <div style={{ height: itemCount * itemHeight }}>
+        <div
+          style={{
+            transform: `translateY(${startIndex * itemHeight}px)`,
+          }}
+        >
+          {generateRows()}
+        </div>
+      </div>
     </ul>
   );
 };
@@ -42,11 +47,9 @@ const listItem = (index: number) => {
     <li
       style={{
         height: `${itemHeight}px`,
-        top: `${itemHeight * index}px`,
         backgroundColor: index & 1 ? "#0f0f0f" : "#1f1f1f",
       }}
       key={index}
-      className="absolute"
     >
       List item {index}
     </li>
