@@ -28,6 +28,10 @@ export const VirtualizedList = ({ itemCount }: { itemCount: number }) => {
       className="overflow-y-scroll w-full border-2 border-black relative"
       onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
     >
+      <div
+        style={{ height: itemCount * itemHeight }}
+        className="absolute w-full"
+      />
       {generateRows()}
     </ul>
   );
